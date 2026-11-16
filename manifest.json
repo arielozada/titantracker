@@ -1,11 +1,15 @@
 {
   "background_color": "#ffffff",
   "dir": "ltr",
-  "display": "standalone",
+  "display": "fullscreen",
   "name": "arielozada.github",
   "orientation": "any",
   "scope": "/",
   "short_name": "arielozada.github",
-  "start_url": "/",
-  "theme_color": "#0f172a"
+  "start_url": "/https://arielozada.github.io/titantracker/",
+  "theme_color": "#0f172a",
+  "lang": "es",
+  "categories": [
+    "productivity"
+  ]
 }
