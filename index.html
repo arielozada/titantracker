@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Titantracker - Science Based</title>
 
-<!-- PWA Manifest Link (Generated Dynamically via JS) -->
-<link id="manifest-link" rel="manifest" href="">
+<!-- PWA Manifest Link -->
+<link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f172a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -274,7 +274,6 @@ let activeExerciseInputs = {}; // Guarda estado temporal de inputs antes de guar
 document.addEventListener('DOMContentLoaded', () => {
 renderDaySelector();
 selectDay(activeDayIndex);
-setupPWA();
 });
 
 function renderDaySelector() {
@@ -847,98 +846,6 @@ showToast('Error al leer el archivo JSON', true);
 }
 };
 reader.readAsText(file);
-}
-
-/* ==========================================
-8. PWA MANIFEST & SERVICE WORKER
-========================================== */
-function setupPWA() {
-const manifestData = {
-"name": "Titantracker",
-"short_name": "Titantracker",
-"start_url": ".",
-"display": "standalone",
-"background_color": "#0f172a",
-"theme_color": "#0f172a",
-"description": "Dashboard para tracking de Hipertrofia y Pasos",
-"icons": [
-{
-"src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='192' height='192' fill='%233b82f6' viewBox='0 0 256 256'><path d='M248,88v80a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0ZM32,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,32,80ZM216,64H184V40a16,16,0,0,0-16-16H88A16,16,0,0,0,72,40V64H40A16,16,0,0,0,24,80v96a16,16,0,0,0,16,16H72v24a16,16,0,0,0,16,16h80a16,16,0,0,0,16-16V192h32a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM88,40h80V64H88ZM216,176H40V80H216V176Z'/></svg>",
-"sizes": "192x192",
-"type": "image/svg+xml"
-},
-{
-"src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='512' height='512' fill='%233b82f6' viewBox='0 0 256 256'><path d='M248,88v80a8,8,0,0,1-16,0V88a8,8,0,0,1,16,0ZM32,80a8,8,0,0,0-8,8v80a8,8,0,0,0,16,0V88A8,8,0,0,0,32,80ZM216,64H184V40a16,16,0,0,0-16-16H88A16,16,0,0,0,72,40V64H40A16,16,0,0,0,24,80v96a16,16,0,0,0,16,16H72v24a16,16,0,0,0,16,16h80a16,16,0,0,0,16-16V192h32a16,16,0,0,0,16-16V80A16,16,0,0,0,216,64ZM88,40h80V64H88ZM216,176H40V80H216V176Z'/></svg>",
-"sizes": "512x512",
-"type": "image/svg+xml"
-}
-]
-};
-
-const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-const manifestUrl = URL.createObjectURL(manifestBlob);
-document.getElementById('manifest-link').href = manifestUrl;
-
-const swCode = `
-const CACHE_NAME = 'titantracker-v1';
-const ASSETS = [ location.href ];
-
-self.addEventListener('install', event => {
-event.waitUntil(
-caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-);
-self.skipWaiting();
-});
-
-self.addEventListener('activate', event => {
-event.waitUntil(
-caches.keys().then(keys => Promise.all(
-keys.map(key => {
-if (key !== CACHE_NAME) return caches.delete(key);
-})
-))
-);
-self.clients.claim();
-});
-
-self.addEventListener('fetch', event => {
-event.respondWith(
-caches.match(event.request).then(response => {
-return response || fetch(event.request).then(fetchRes => {
-return caches.open(CACHE_NAME).then(cache => {
-if(event.request.method === 'GET' && !event.request.url.startsWith('chrome-extension')) {
-cache.put(event.request.url, fetchRes.clone());
-}
-return fetchRes;
-});
-});
-}).catch(() => {})
-);
-});
-`;
-
-const swBlob = new Blob([swCode], { type: 'application/javascript' });
-const swUrl = URL.createObjectURL(swBlob);
-
-if ('serviceWorker' in navigator) {
-navigator.serviceWorker.register(swUrl).catch(err => console.log('SW Error:', err));
-}
-
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-e.preventDefault();
-deferredPrompt = e;
-const installContainer = document.getElementById('pwa-install-container');
-installContainer.classList.remove('hidden');
-
-document.getElementById('btn-install').addEventListener('click', () => {
-installContainer.classList.add('hidden');
-deferredPrompt.prompt();
-deferredPrompt.userChoice.then((choiceResult) => {
-deferredPrompt = null;
-});
-});
-});
 }
 </script>
 </body>
