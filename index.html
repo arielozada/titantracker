@@ -848,5 +848,10 @@ showToast('Error al leer el archivo JSON', true);
 reader.readAsText(file);
 }
 </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('pwabuilder-sw.js');
+  }
+</script>
 </body>
 </html>
